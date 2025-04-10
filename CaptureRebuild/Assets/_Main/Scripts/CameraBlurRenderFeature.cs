@@ -22,4 +22,12 @@ public class CameraBlurRenderFeature : ScriptableRendererFeature
             renderer.EnqueuePass(cameraBlurPass);
         }
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && cameraBlurPass != null)
+        {
+            cameraBlurPass.Dispose();
+        }
+    }
 }
