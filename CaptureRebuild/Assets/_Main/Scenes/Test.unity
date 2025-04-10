@@ -1006,6 +1006,10 @@ PrefabInstance:
       propertyPath: m_CastShadows
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -1705927091320911716, guid: 63e04782e58e83d47a1be58eda88b89f, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 63e04782e58e83d47a1be58eda88b89f, type: 3}
       propertyPath: m_Name
       value: InstantCamera
@@ -1017,6 +1021,10 @@ PrefabInstance:
     - target: {fileID: 4129698028516757018, guid: 63e04782e58e83d47a1be58eda88b89f, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129698028516757018, guid: 63e04782e58e83d47a1be58eda88b89f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1163,7 +1171,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 56a2a7f61d8983b4ebf1b958234c3ee6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.65
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 56a2a7f61d8983b4ebf1b958234c3ee6, type: 3}
       propertyPath: m_LocalRotation.w
