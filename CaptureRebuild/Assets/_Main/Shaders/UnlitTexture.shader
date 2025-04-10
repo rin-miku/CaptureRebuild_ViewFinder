@@ -9,7 +9,7 @@ Shader "Custom/UnlitTexture"
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "RenderPipeline" = "UniversalPipeline"}
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
         
@@ -22,33 +22,45 @@ Shader "Custom/UnlitTexture"
                 Pass replace
             }
 
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
             #include "UnityCG.cginc"
 
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
+            struct appdata 
+            { 
+                float4 vertex : POSITION; 
+                float2 uv : TEXCOORD0; 
+            };
 
-            sampler2D _MainTex;
-            sampler2D _OverlayTex;
+            struct v2f 
+            { 
+                float4 pos : SV_POSITION; 
+                float2 uv : TEXCOORD0; 
+            };
+
+            Texture2D _MainTex;
+            Texture2D _OverlayTex;
             float4 _MianTexColor;
             float4 _OverlayTexColor;
+            SamplerState sampler_LinearClamp;
 
-            v2f vert(appdata v) {
+            v2f Vert(appdata v) 
+            {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target {
-                fixed4 baseColor = tex2D(_MainTex, i.uv) * _MianTexColor;
-                fixed4 overlayColor = tex2D(_OverlayTex, i.uv) * _OverlayTexColor;
-                baseColor = lerp(baseColor,overlayColor,overlayColor.a);
-                return baseColor;
+            float4 Frag(v2f i) : SV_Target 
+            {
+                float4 baseColor = _MainTex.Sample(sampler_LinearClamp, i.uv) * _MianTexColor;
+                float4 overlayColor = _OverlayTex.Sample(sampler_LinearClamp, i.uv) * _OverlayTexColor;
+                return lerp(baseColor, overlayColor, overlayColor.a);
             }
-            ENDCG
+            ENDHLSL
         }
     }
+    FallBack "Diffuse"
 }
