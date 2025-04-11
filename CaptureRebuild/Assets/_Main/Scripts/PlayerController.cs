@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     public Transform groundCheck;
     public Transform playerCamera;
+    public List<ItemBase> items;
 
     private CharacterController controller;
 
@@ -38,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        SwitchItem();
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
@@ -85,5 +88,18 @@ public class PlayerController : MonoBehaviour
 
         playerCamera.localRotation = Quaternion.Euler(currentXRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
+    }
+
+    private void SwitchItem()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            items[0].ShowAnimation();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            items[1].ShowAnimation();
+        }
     }
 }

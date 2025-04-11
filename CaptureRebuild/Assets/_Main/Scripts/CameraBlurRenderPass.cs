@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -10,9 +11,10 @@ public class CameraBlurRenderPass : ScriptableRenderPass
     private RTHandle rtHandler;
     private CameraBlurVolumeComponent blurVolume;
     private RenderTextureDescriptor textureDescriptor;
+
     private float[] weights;
 
-    private void InitWeights()
+    private void NormalizeWeights()
     {
         weights = new float[]
         {
@@ -25,23 +27,22 @@ public class CameraBlurRenderPass : ScriptableRenderPass
 
     public CameraBlurRenderPass(CustomRPSettings customRPSettings)
     {
-        InitWeights();
+        NormalizeWeights();
 
-        GameObject.Find("GlobalVolume").GetComponent<Volume>().profile.TryGet(out blurVolume);
+        GameObject.Find("GlobalVolume")?.GetComponent<Volume>()?.profile.TryGet(out blurVolume);
 
         renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
         blurMaterial = CoreUtils.CreateEngineMaterial(customRPSettings.blurShader);
         blurMaterial.SetFloat("_BlurSize", 0f);
         blurMaterial.SetFloatArray("_Weights", weights);
-
-        textureDescriptor = new RenderTextureDescriptor(Screen.width, Screen.height, RenderTextureFormat.RGB111110Float, 0);
     }
 
     public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
     {
-        textureDescriptor.width = cameraTextureDescriptor.width;
-        textureDescriptor.height = cameraTextureDescriptor.height;
+        textureDescriptor = cameraTextureDescriptor;
+        textureDescriptor.graphicsFormat = GraphicsFormat.B10G11R11_UFloatPack32;
+        textureDescriptor.depthBufferBits = 0;
 
         RenderingUtils.ReAllocateIfNeeded(ref rtHandler, textureDescriptor, wrapMode: TextureWrapMode.Clamp, name: "_BlurRT");
     }
@@ -50,15 +51,22 @@ public class CameraBlurRenderPass : ScriptableRenderPass
     {
         CommandBuffer cmd = CommandBufferPool.Get("CameraBlur");
         cameraColorTargetHandle = renderingData.cameraData.renderer.cameraColorTargetHandle;
+        if (cameraColorTargetHandle.rt == null)
+        {
+            Debug.Log("CameraColorTargetHandle is null");
+            return;
+        }
 
-        if (!blurVolume.enableCameraBlur.value) return;
-        blurMaterial.SetFloat("_BlurSize", blurVolume.blurSize.value);
+        if (blurVolume.enableCameraBlur.value)
+        {
+            blurMaterial.SetFloat("_BlurSize", blurVolume.blurSize.value);
 
-        blurMaterial.SetVector("_BlurDirection", new Vector2(1.0f, 0.0f));
-        Blit(cmd, cameraColorTargetHandle, rtHandler, blurMaterial);
+            blurMaterial.SetVector("_BlurDirection", new Vector2(1.0f, 0.0f));
+            Blit(cmd, cameraColorTargetHandle, rtHandler, blurMaterial);
 
-        blurMaterial.SetVector("_BlurDirection", new Vector2(0.0f, 1.0f));
-        Blit(cmd, rtHandler, cameraColorTargetHandle, blurMaterial);
+            blurMaterial.SetVector("_BlurDirection", new Vector2(0.0f, 1.0f));
+            Blit(cmd, rtHandler, cameraColorTargetHandle, blurMaterial);
+        }
 
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
