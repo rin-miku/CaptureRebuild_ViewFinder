@@ -27,7 +27,7 @@ public class CameraBlurRenderPass : ScriptableRenderPass
     {
         InitWeights();
 
-        blurVolume = VolumeManager.instance.stack.GetComponent<CameraBlurVolumeComponent>();
+        GameObject.Find("GlobalVolume").GetComponent<Volume>().profile.TryGet(out blurVolume);
 
         renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
