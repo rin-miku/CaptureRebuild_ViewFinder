@@ -8,21 +8,28 @@ public class CameraBlurRenderPass : ScriptableRenderPass
     private Material blurMaterial;
     private RTHandle cameraColorTargetHandle;
     private RTHandle rtHandler;
+    private CameraBlurVolumeComponent blurVolume;
     private RenderTextureDescriptor textureDescriptor;
-    private float[] weights = new float[]
+    private float[] weights;
+
+    private void InitWeights()
     {
-        0.0030f, 0.0133f, 0.0298f, 0.0510f, 0.0702f, 0.0862f, 0.0939f, 0.0862f, 0.0702f, 0.0510f, 0.0298f, 0.0133f, 0.0030f
-    };
+        weights = new float[]
+        {
+            0.0030f, 0.0133f, 0.0298f, 0.0510f, 0.0702f, 0.0862f, 0.0939f, 0.0862f, 0.0702f, 0.0510f, 0.0298f, 0.0133f, 0.0030f
+        };
+
+        float weightSum = weights.Sum();
+        weights = weights.Select(weight => weight / weightSum).ToArray();
+    }
 
     public CameraBlurRenderPass(CustomRPSettings customRPSettings)
     {
-        float sum = weights.Sum();
-        for(int i = 0; i < weights.Length; i++)
-        {
-            weights[i] /= sum;
-        }
+        InitWeights();
 
-        renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+        blurVolume = VolumeManager.instance.stack.GetComponent<CameraBlurVolumeComponent>();
+
+        renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
         blurMaterial = CoreUtils.CreateEngineMaterial(customRPSettings.blurShader);
         blurMaterial.SetFloat("_BlurSize", 0f);
@@ -36,7 +43,7 @@ public class CameraBlurRenderPass : ScriptableRenderPass
         textureDescriptor.width = cameraTextureDescriptor.width;
         textureDescriptor.height = cameraTextureDescriptor.height;
 
-        RenderingUtils.ReAllocateIfNeeded(ref rtHandler, textureDescriptor, wrapMode: TextureWrapMode.Clamp, name: "_BlurRT1");
+        RenderingUtils.ReAllocateIfNeeded(ref rtHandler, textureDescriptor, wrapMode: TextureWrapMode.Clamp, name: "_BlurRT");
     }
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -44,9 +51,8 @@ public class CameraBlurRenderPass : ScriptableRenderPass
         CommandBuffer cmd = CommandBufferPool.Get("CameraBlur");
         cameraColorTargetHandle = renderingData.cameraData.renderer.cameraColorTargetHandle;
 
-        CameraBlurVolumeComponent cameraBlurSettings = VolumeManager.instance.stack.GetComponent<CameraBlurVolumeComponent>();
-        if (!cameraBlurSettings.enableCameraBlur.value) return;
-        blurMaterial.SetFloat("_BlurSize", cameraBlurSettings.blurSize.value);
+        if (!blurVolume.enableCameraBlur.value) return;
+        blurMaterial.SetFloat("_BlurSize", blurVolume.blurSize.value);
 
         blurMaterial.SetVector("_BlurDirection", new Vector2(1.0f, 0.0f));
         Blit(cmd, cameraColorTargetHandle, rtHandler, blurMaterial);

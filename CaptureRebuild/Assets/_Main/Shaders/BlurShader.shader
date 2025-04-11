@@ -3,7 +3,7 @@ Shader "Custom/BlurShader"
     SubShader
     {
         Tags { "RenderType"="Opaque" "RenderPipeline" = "UniversalPipeline"}
-        ZTest Always ZWrite Off Cull Off
+        Cull Off
 
         Pass
         {
