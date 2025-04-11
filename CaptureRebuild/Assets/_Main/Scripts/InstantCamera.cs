@@ -61,7 +61,7 @@ public class InstantCamera : ItemBase
             .Join(transform.DOLocalRotate(pointerValues[1].rotation, 1f))
             .Join(transform.DOScale(pointerValues[1].scale, 1f))
             .Join(DOVirtual.Float(sceneCamera.fieldOfView, 55f, 0.7f, value => { sceneCamera.fieldOfView = value; }).SetDelay(0.3f))
-            .Join(DOVirtual.Float(blurVolume.blurSize.value, 10f, 1f, value => { blurVolume.blurSize.value = value; }))
+            .Join(DOVirtual.Float(blurVolume.blurSize.value, 5f, 1f, value => { blurVolume.blurSize.value = value; }))
             .OnComplete(() => isReady = true);
     }
 

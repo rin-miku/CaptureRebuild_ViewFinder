@@ -51,22 +51,16 @@ public class CameraBlurRenderPass : ScriptableRenderPass
     {
         CommandBuffer cmd = CommandBufferPool.Get("CameraBlur");
         cameraColorTargetHandle = renderingData.cameraData.renderer.cameraColorTargetHandle;
-        if (cameraColorTargetHandle.rt == null)
-        {
-            Debug.Log("CameraColorTargetHandle is null");
-            return;
-        }
+        if (cameraColorTargetHandle.rt == null) return;
 
-        if (blurVolume.enableCameraBlur.value)
-        {
-            blurMaterial.SetFloat("_BlurSize", blurVolume.blurSize.value);
+        if (blurVolume == null || !blurVolume.enableCameraBlur.value) return;
+        blurMaterial.SetFloat("_BlurSize", blurVolume.blurSize.value);
 
-            blurMaterial.SetVector("_BlurDirection", new Vector2(1.0f, 0.0f));
-            Blit(cmd, cameraColorTargetHandle, rtHandler, blurMaterial);
+        blurMaterial.SetVector("_BlurDirection", new Vector2(1.0f, 0.0f));
+        Blit(cmd, cameraColorTargetHandle, rtHandler, blurMaterial);
 
-            blurMaterial.SetVector("_BlurDirection", new Vector2(0.0f, 1.0f));
-            Blit(cmd, rtHandler, cameraColorTargetHandle, blurMaterial);
-        }
+        blurMaterial.SetVector("_BlurDirection", new Vector2(0.0f, 1.0f));
+        Blit(cmd, rtHandler, cameraColorTargetHandle, blurMaterial);
 
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
