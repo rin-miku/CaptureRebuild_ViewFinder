@@ -6,5 +6,5 @@ using UnityEngine.Rendering;
 public class CameraBlurVolumeComponent : VolumeComponent
 {
     public BoolParameter enableCameraBlur = new BoolParameter(false);
-    public ClampedFloatParameter blurSize = new ClampedFloatParameter(0f, 0f, 10f);
+    public ClampedFloatParameter blurSize = new ClampedFloatParameter(0f, 0f, 5f);
 }

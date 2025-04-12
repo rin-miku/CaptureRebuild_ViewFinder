@@ -34,7 +34,7 @@ public class InstantCamera : ItemBase
 
         if (isReady && Input.GetMouseButtonDown(0))
         {
-            TakePhoto();
+            CapturePhoto();
         }
     }
 
@@ -61,7 +61,7 @@ public class InstantCamera : ItemBase
             .Join(transform.DOLocalRotate(pointerValues[1].rotation, 1f))
             .Join(transform.DOScale(pointerValues[1].scale, 1f))
             .Join(DOVirtual.Float(sceneCamera.fieldOfView, 55f, 0.7f, value => { sceneCamera.fieldOfView = value; }).SetDelay(0.3f))
-            .Join(DOVirtual.Float(blurVolume.blurSize.value, 5f, 1f, value => { blurVolume.blurSize.value = value; }))
+            .Join(DOVirtual.Float(blurVolume.blurSize.value, 1.5f, 1f, value => { blurVolume.blurSize.value = value; }))
             .OnComplete(() => isReady = true);
     }
 
@@ -80,7 +80,7 @@ public class InstantCamera : ItemBase
             .OnComplete(() => blurVolume.enableCameraBlur.value = false);
     }
 
-    private void TakePhoto()
+    private void CapturePhoto()
     {
         RenderTexture targetTexture = viewCamera.targetTexture;
         RenderTexture activeRT = RenderTexture.active;

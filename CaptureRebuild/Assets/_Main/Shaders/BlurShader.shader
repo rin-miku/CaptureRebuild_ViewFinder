@@ -31,7 +31,7 @@ Shader "Custom/BlurShader"
                 float2 uv = input.texcoord;
                 float4 color = 0;
 
-                float offsetScale = _BlurSize / _ScreenParams.xy; 
+                float2 offsetScale = _BlurSize / _ScreenParams.xy; 
                 float2 offset = _BlurDirection * offsetScale;
 
                 [unroll]
