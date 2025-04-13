@@ -25,15 +25,15 @@ public class CameraBlurRenderPass : ScriptableRenderPass
         weights = weights.Select(weight => weight / weightSum).ToArray();
     }
 
-    public CameraBlurRenderPass(CustomRPSettings customRPSettings)
+    public CameraBlurRenderPass(CameraBlurRPSettings settings)
     {
         NormalizeWeights();
 
         GameObject.Find("GlobalVolume")?.GetComponent<Volume>()?.profile.TryGet(out blurVolume);
 
-        renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
+        renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing - 1;
 
-        blurMaterial = CoreUtils.CreateEngineMaterial(customRPSettings.blurShader);
+        blurMaterial = CoreUtils.CreateEngineMaterial(settings.blurShader);
         blurMaterial.SetFloat("_BlurSize", 0f);
         blurMaterial.SetFloatArray("_Weights", weights);
     }

@@ -9,19 +9,12 @@ Shader "Custom/UnlitTexture"
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" "RenderPipeline" = "UniversalPipeline"}
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "RenderPipeline" = "UniversalPipeline" "LightMode"="Unblurred"}
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
         
         Pass
         {
-            Stencil
-            {
-                Ref 1             
-                Comp always      
-                Pass replace
-            }
-
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag

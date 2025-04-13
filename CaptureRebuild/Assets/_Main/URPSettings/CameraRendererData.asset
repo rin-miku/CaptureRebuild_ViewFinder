@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: CameraBlurRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  customRPSettings:
+  cameraBlurRPSettings:
     blurShader: {fileID: 4800000, guid: 8404006a978a1f243a78d76b345d4277, type: 3}
-    overlayLayerMask:
+  unblurredRPSettings:
+    unblurredShaderTagId: Unblurred
+    unblurredLayMask:
       serializedVersion: 2
       m_Bits: 128
 --- !u!114 &11400000

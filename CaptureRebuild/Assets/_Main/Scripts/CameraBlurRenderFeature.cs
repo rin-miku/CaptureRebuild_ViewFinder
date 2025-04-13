@@ -4,30 +4,43 @@ using UnityEngine.Rendering.Universal;
 [Serializable]
 public class CameraBlurRenderFeature : ScriptableRendererFeature
 {
-    public CustomRPSettings customRPSettings;
-    private CameraBlurRenderPass cameraBlurPass;
+    public CameraBlurRPSettings cameraBlurRPSettings;
+    public UnblurredRPSettings unblurredRPSettings;
+
+    private CameraBlurRenderPass cameraBlurRenderPass;
+    private UnblurredRenderPass unblurredRenderPass;
 
     public override void Create()
     {
-        if (customRPSettings != null)
+        if (cameraBlurRPSettings != null)
         {
-            cameraBlurPass = new CameraBlurRenderPass(customRPSettings);
+            cameraBlurRenderPass = new CameraBlurRenderPass(cameraBlurRPSettings);
+        }
+
+        if (unblurredRPSettings != null)
+        {
+            unblurredRenderPass = new UnblurredRenderPass(unblurredRPSettings);
         }
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (cameraBlurPass != null)
+        if (cameraBlurRenderPass != null)
         {
-            renderer.EnqueuePass(cameraBlurPass);
+            renderer.EnqueuePass(cameraBlurRenderPass);
+        }
+
+        if (unblurredRenderPass != null)
+        {
+            renderer.EnqueuePass(unblurredRenderPass);
         }
     }
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing && cameraBlurPass != null)
+        if (disposing && cameraBlurRenderPass != null)
         {
-            cameraBlurPass.Dispose();
+            cameraBlurRenderPass.Dispose();
         }
     }
 }
