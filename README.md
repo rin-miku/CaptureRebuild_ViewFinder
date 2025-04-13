@@ -1,2 +1,4 @@
 # CaptureRebuild_ViewFinder
 Captrure and rebuild 3d object function in View Finder
+
+![](./CaptureRebuild_ViewFinder.gif)
