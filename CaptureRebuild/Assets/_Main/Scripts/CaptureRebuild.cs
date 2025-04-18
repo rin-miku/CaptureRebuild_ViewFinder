@@ -4,7 +4,6 @@ using UnityEngine;
 
 public partial class CaptureRebuild : MonoBehaviour
 {
-    public Photo photo;
     public Camera viewCamera;
     public Camera skyboxCamera;
     public Transform captureRoot;
@@ -105,7 +104,7 @@ public partial class CaptureRebuild : MonoBehaviour
                 temp.transform.rotation = capturableObject.transform.rotation;
 
                 Mesh mesh = temp.GetComponent<MeshFilter>().mesh;
-                CutMesh(mesh, plane.flipped, temp.transform);
+                CutMesh(mesh, plane.flipped, temp.transform, true);
 
                 Destroy(temp.GetComponent<MeshCollider>());
                 temp.AddComponent<MeshCollider>().sharedMesh = mesh; 

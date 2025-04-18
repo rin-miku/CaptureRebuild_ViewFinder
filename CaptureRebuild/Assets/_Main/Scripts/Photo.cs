@@ -7,6 +7,7 @@ public class Photo : ItemBase
     public MeshRenderer meshRenderer;
     public InstantCamera instantCamera;
     public CaptureRebuild captureRebuild;
+    public Transform photoMod;
 
     private Sequence inSequence;
     private Sequence outSequence;
@@ -23,26 +24,22 @@ public class Photo : ItemBase
             OutAnimation();
         }
 
-        if (isReady)
+        if (isReady && Input.GetMouseButtonDown(0))
         {
-            RotatePhoto();
-            if (Input.GetMouseButtonDown(0))
-            {
-                RebuildPhoto();
-            }
+            RebuildPhoto();
         }
     }
 
     public override void ShowAnimation(float duration = 1f)
     {
         instantCamera.HideAnimation();
-        transform.DOLocalMoveY(pointerValues[2].position.y, duration).OnComplete(() => isShow = true);
+        photoMod.DOLocalMoveY(pointerValues[2].position.y, duration).OnComplete(() => isShow = true);
     }
 
     public override void HideAnimation(float duration = 1f)
     {
         isShow = false;
-        transform.DOLocalMoveY(pointerValues[0].position.y, duration);
+        photoMod.DOLocalMoveY(pointerValues[0].position.y, duration);
     }
 
     public override void InAnimation(float duration = 1f)
@@ -51,9 +48,9 @@ public class Photo : ItemBase
 
         inSequence = DOTween.Sequence();
         inSequence
-            .Join(transform.DOLocalMove(pointerValues[1].position, duration))
-            .Join(transform.DOLocalRotate(pointerValues[1].rotation, duration))
-            .Join(transform.DOScale(pointerValues[1].scale, duration))
+            .Join(photoMod.DOLocalMove(pointerValues[1].position, duration))
+            .Join(photoMod.DOLocalRotate(pointerValues[1].rotation, duration))
+            .Join(photoMod.DOScale(pointerValues[1].scale, duration))
             .OnComplete(() => isReady = true);
     }
 
@@ -64,9 +61,9 @@ public class Photo : ItemBase
         outSequence = DOTween.Sequence();
         outSequence
             .OnStart(() => isReady = false)
-            .Join(transform.DOLocalMove(pointerValues[2].position, duration))
-            .Join(transform.DOLocalRotate(pointerValues[2].rotation, duration))
-            .Join(transform.DOScale(pointerValues[2].scale, duration));
+            .Join(photoMod.DOLocalMove(pointerValues[2].position, duration))
+            .Join(photoMod.DOLocalRotate(pointerValues[2].rotation, duration))
+            .Join(photoMod.DOScale(pointerValues[2].scale, duration));
     }
 
     public void SetPhotoTexture(Texture2D texture)
@@ -80,13 +77,6 @@ public class Photo : ItemBase
     {
         yield return new WaitForSeconds(1f);
         ShowAnimation();
-    }
-
-    private void RotatePhoto()
-    {
-        Vector3 targetRotation = transform.localRotation.eulerAngles;
-        targetRotation.z += 30f * Input.mouseScrollDelta.y;
-        transform.DOLocalRotate(targetRotation, 0.2f);
     }
 
     private void RebuildPhoto()

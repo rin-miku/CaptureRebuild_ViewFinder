@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 
 public partial class CaptureRebuild : MonoBehaviour
 {
-    private void CutMesh(Mesh mesh, Plane plane, Transform objectTransform)
+    private void CutMesh(Mesh mesh, Plane plane, Transform objectTransform, bool planeOutSide = false)
     {
         // 初始化网格数据
         List<Vector3> meshVertices = new();
@@ -80,7 +80,7 @@ public partial class CaptureRebuild : MonoBehaviour
         List<bool> sideResults = CommonTools.ToBoolList(jobSideResults);
         jobMeshVertices.Dispose();
         jobSideResults.Dispose();
-        if (!sideResults.Contains(true)) mesh.Clear();
+        if (!sideResults.Contains(true) && planeOutSide) mesh.Clear();
         if (!sideResults.Contains(true) || !sideResults.Contains(false)) return;
 
         // 网格切割
