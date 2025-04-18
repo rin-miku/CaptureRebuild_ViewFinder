@@ -15,35 +15,41 @@ public partial class CaptureRebuild : MonoBehaviour
 
     public void Capture()
     {
-        photo.transform.localPosition = Vector3.zero;
-        photo.transform.localRotation = Quaternion.identity;
         captureRoot.localScale = Vector3.one;
 
-        CaptureObjectsInFrustum();
+        CutObjectMeshInFrustum();
 
-        CaptureSkyboxInFrustum();
+        CutSkyboxInFrustum();
 
-        photo.transform.localPosition = photo.pointerValues[0].position;
-        photo.transform.localRotation = Quaternion.Euler(photo.pointerValues[0].rotation);
         captureRoot.localScale = Vector3.zero;
     }
 
     public void Rebuild()
     {
+        DestroyObjectMeshInFrustum();
+
         GameObject tempRebuild = Instantiate(captureRoot.gameObject, rebuildRoot, true);
         tempRebuild.transform.localScale = Vector3.one;
+        foreach(Transform child in tempRebuild.transform)
+        {
+            child.GetComponent<Capturable>().isCapturable = true;
+        }
     }
 
-    private void CaptureObjectsInFrustum()
+    private void CutObjectMeshInFrustum()
     {
-        foreach (Transform child in captureRoot) Destroy(child.gameObject);
+        for(int i = 0; i < captureRoot.childCount; i++)
+        {
+            Destroy(captureRoot.GetChild(i).gameObject);
+        }
 
         frustumPlanes = GeometryUtility.CalculateFrustumPlanes(viewCamera);
 
         IEnumerable capturableObjects =
             FindObjectsOfType<Capturable>().Where(a =>
             {
-                return a.TryGetComponent(out Renderer renderer) &&
+                return a.GetComponent<Capturable>().isCapturable &&
+                a.TryGetComponent(out Renderer renderer) &&
                 renderer != null &&
                 GeometryUtility.TestPlanesAABB(frustumPlanes, renderer.bounds);
             });
@@ -53,11 +59,12 @@ public partial class CaptureRebuild : MonoBehaviour
             GameObject temp = Instantiate(capturableObject.gameObject, captureRoot, true);
             temp.transform.position = capturableObject.transform.position;
             temp.transform.rotation = capturableObject.transform.rotation;
+            temp.GetComponent<Capturable>().isCapturable = false;
 
             Mesh mesh = temp.GetComponent<MeshFilter>().mesh;
             foreach(Plane plane in frustumPlanes)
             {
-                CutMesh(mesh, plane, capturableObject.transform);
+                CutMesh(mesh, plane, temp.transform);
             }
 
             Destroy(temp.GetComponent<MeshCollider>());
@@ -65,10 +72,45 @@ public partial class CaptureRebuild : MonoBehaviour
         }
     }
 
-    private void CaptureSkyboxInFrustum()
+    private void CutSkyboxInFrustum()
     {
         Texture2D skyboxTexture = CommonTools.GetCameraTexture(skyboxCamera);
 
-        Instantiate(skyboxPanelPrefab, captureRoot).GetComponent<MeshRenderer>().materials[0].SetTexture("_BaseMap", skyboxTexture);
+        GameObject skyboxPanel = Instantiate(skyboxPanelPrefab, captureRoot);
+        skyboxPanel.GetComponent<MeshRenderer>().materials[0].SetTexture("_BaseMap", skyboxTexture);
+        skyboxPanel.AddComponent<Capturable>().isCapturable = false;
+    }
+
+    private void DestroyObjectMeshInFrustum()
+    {
+        frustumPlanes = GeometryUtility.CalculateFrustumPlanes(viewCamera);
+
+        IEnumerable capturableObjects =
+            FindObjectsOfType<Capturable>().Where(a =>
+            {
+                return a.GetComponent<Capturable>().isCapturable &&
+                a.TryGetComponent(out Renderer renderer) &&
+                renderer != null &&
+                GeometryUtility.TestPlanesAABB(frustumPlanes, renderer.bounds);
+            });
+
+        GameObject tempCaptureRoot = new GameObject("TempCaptureRoot");
+        tempCaptureRoot.transform.parent = rebuildRoot;
+        foreach (Capturable capturableObject in capturableObjects)
+        {
+            foreach (Plane plane in frustumPlanes)
+            {
+                GameObject temp = Instantiate(capturableObject.gameObject, tempCaptureRoot.transform, true);
+                temp.transform.position = capturableObject.transform.position;
+                temp.transform.rotation = capturableObject.transform.rotation;
+
+                Mesh mesh = temp.GetComponent<MeshFilter>().mesh;
+                CutMesh(mesh, plane.flipped, temp.transform);
+
+                Destroy(temp.GetComponent<MeshCollider>());
+                temp.AddComponent<MeshCollider>().sharedMesh = mesh; 
+            }
+            Destroy(capturableObject.gameObject);
+        }
     }
 }

@@ -80,6 +80,7 @@ public partial class CaptureRebuild : MonoBehaviour
         List<bool> sideResults = CommonTools.ToBoolList(jobSideResults);
         jobMeshVertices.Dispose();
         jobSideResults.Dispose();
+        if (!sideResults.Contains(true)) mesh.Clear();
         if (!sideResults.Contains(true) || !sideResults.Contains(false)) return;
 
         // 网格切割

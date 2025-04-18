@@ -6,5 +6,5 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class Capturable : MonoBehaviour
 {
-
+    public bool isCapturable = true;
 }

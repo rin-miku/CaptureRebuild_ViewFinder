@@ -20,7 +20,7 @@ public class Photo : ItemBase
 
         if (isShow && Input.GetMouseButtonUp(1))
         {
-            //OutAnimation();
+            OutAnimation();
         }
 
         if (isReady)
@@ -91,9 +91,9 @@ public class Photo : ItemBase
 
     private void RebuildPhoto()
     {
-        OutAnimation(0f);
-        HideAnimation(0f);
-
         captureRebuild.Rebuild();
+
+        OutAnimation(0f);
+        HideAnimation(0f); 
     }
 }
