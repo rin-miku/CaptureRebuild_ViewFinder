@@ -17,8 +17,8 @@ public abstract class ItemBase : MonoBehaviour
     public bool isReady;
     public List<PointerValue> pointerValues;
 
-    public abstract void ShowAnimation();
-    public abstract void HideAnimation();
-    public abstract void InAnimation();
-    public abstract void OutAnimation();
+    public abstract void ShowAnimation(float duration = 1f);
+    public abstract void HideAnimation(float duration = 1f);
+    public abstract void InAnimation(float duration = 1f);
+    public abstract void OutAnimation(float duration = 1f);
 }

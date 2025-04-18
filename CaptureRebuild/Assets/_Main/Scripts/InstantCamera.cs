@@ -38,62 +38,54 @@ public class InstantCamera : ItemBase
         }
     }
 
-    public override void ShowAnimation()
+    public override void ShowAnimation(float duration = 1f)
     {
         photo.HideAnimation();
-        transform.DOLocalMoveY(pointerValues[2].position.y, 1f).OnComplete(() => isShow = true);
+        transform.DOLocalMoveY(pointerValues[2].position.y, duration).OnComplete(() => isShow = true);
     }
 
-    public override void HideAnimation()
+    public override void HideAnimation(float duration = 1f)
     {
         isShow = false;
-        transform.DOLocalMoveY(pointerValues[0].position.y, 1f);
+        transform.DOLocalMoveY(pointerValues[0].position.y, duration);
     }
 
-    public override void InAnimation()
+    public override void InAnimation(float duration = 1f)
     {
         outSequence?.Kill();
 
         inSequence = DOTween.Sequence();
         inSequence
             .OnStart(() => blurVolume.enableCameraBlur.value = true)
-            .Join(transform.DOLocalMove(pointerValues[1].position, 1f))
-            .Join(transform.DOLocalRotate(pointerValues[1].rotation, 1f))
-            .Join(transform.DOScale(pointerValues[1].scale, 1f))
+            .Join(transform.DOLocalMove(pointerValues[1].position, duration))
+            .Join(transform.DOLocalRotate(pointerValues[1].rotation, duration))
+            .Join(transform.DOScale(pointerValues[1].scale, duration))
             .Join(DOVirtual.Float(sceneCamera.fieldOfView, 55f, 0.7f, value => { sceneCamera.fieldOfView = value; }).SetDelay(0.3f))
-            .Join(DOVirtual.Float(blurVolume.blurSize.value, 1.5f, 1f, value => { blurVolume.blurSize.value = value; }))
+            .Join(DOVirtual.Float(blurVolume.blurSize.value, 1.5f, duration, value => { blurVolume.blurSize.value = value; }))
             .OnComplete(() => isReady = true);
     }
 
-    public override void OutAnimation()
+    public override void OutAnimation(float duration = 1f)
     {
         inSequence?.Kill();
 
         outSequence = DOTween.Sequence();
         outSequence
             .OnStart(() => isReady = false)
-            .Join(transform.DOLocalMove(pointerValues[2].position, 1f))
-            .Join(transform.DOLocalRotate(pointerValues[2].rotation, 1f))
-            .Join(transform.DOScale(pointerValues[2].scale, 1f))
+            .Join(transform.DOLocalMove(pointerValues[2].position, duration))
+            .Join(transform.DOLocalRotate(pointerValues[2].rotation, duration))
+            .Join(transform.DOScale(pointerValues[2].scale, duration))
             .Join(DOVirtual.Float(sceneCamera.fieldOfView, 60f, 0.7f, value => { sceneCamera.fieldOfView = value; }).SetDelay(0.3f))
-            .Join(DOVirtual.Float(blurVolume.blurSize.value, 0f, 1f, value => { blurVolume.blurSize.value = value; }))
+            .Join(DOVirtual.Float(blurVolume.blurSize.value, 0f, duration, value => { blurVolume.blurSize.value = value; }))
             .OnComplete(() => blurVolume.enableCameraBlur.value = false);
     }
 
     private void CapturePhoto()
     {
-        RenderTexture targetTexture = viewCamera.targetTexture;
-        RenderTexture activeRT = RenderTexture.active;
-        RenderTexture.active = viewCamera.targetTexture;
-        int width = viewCamera.targetTexture.width;
-        int height = viewCamera.targetTexture.height;
-
-        Texture2D photoTexture = new Texture2D(width, height, TextureFormat.RGB24, false);
-        photoTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        photoTexture.Apply();
-        RenderTexture.active = activeRT;
+        Texture2D photoTexture = CommonTools.GetCameraTexture(viewCamera);
 
         photo.SetPhotoTexture(photoTexture);
+
         OutAnimation();
     }
 

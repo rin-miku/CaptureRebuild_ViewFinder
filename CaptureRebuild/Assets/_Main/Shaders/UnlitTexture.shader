@@ -10,6 +10,7 @@ Shader "Custom/UnlitTexture"
     SubShader
     {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" "RenderPipeline" = "UniversalPipeline" "LightMode"="Unblurred"}
+        Lighting Off
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
         
