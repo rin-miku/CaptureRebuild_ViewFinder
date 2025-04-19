@@ -213,8 +213,8 @@ public partial class CaptureRebuild : MonoBehaviour
 
         void Check1In2Out(int index1In, int index2Out, int index3Out, int submesh)
         {
-            int newVertex1Index = EdgeCut(index1In, index2Out);
-            int newVertex2Index = EdgeCut(index1In, index3Out);
+            int newVertex1Index = CutEdge(index1In, index2Out);
+            int newVertex2Index = CutEdge(index1In, index3Out);
 
             newEdgePoints.Add((newVertices[newVertex1Index], newVertices[newVertex2Index]));
 
@@ -227,8 +227,8 @@ public partial class CaptureRebuild : MonoBehaviour
 
         void Check2In1Out(int index1In, int index2In, int index3Out, int submesh)
         {
-            int newVertex1Index = EdgeCut(index1In, index3Out);
-            int newVertex2Index = EdgeCut(index2In, index3Out);
+            int newVertex1Index = CutEdge(index1In, index3Out);
+            int newVertex2Index = CutEdge(index2In, index3Out);
 
             newEdgePoints.Add((newVertices[newVertex1Index], newVertices[newVertex2Index]));
 
@@ -255,7 +255,7 @@ public partial class CaptureRebuild : MonoBehaviour
             newTriangles[submesh].AddRange(trianglesToAdd);
         }
 
-        int EdgeCut(int vertexInIndex, int vertexOutIndex)
+        int CutEdge(int vertexInIndex, int vertexOutIndex)
         {
             Vector3 vertexIn = meshVertices[vertexInIndex];
             Vector3 vertexOut = meshVertices[vertexOutIndex];

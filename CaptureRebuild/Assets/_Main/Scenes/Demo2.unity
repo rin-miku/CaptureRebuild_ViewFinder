@@ -34386,7 +34386,7 @@ MonoBehaviour:
   sprintSpeed: 15
   jumpForce: 3
   gravity: -19.8
-  mouseSensitivity: 500
+  mouseSensitivity: 1500
   lookSmoothness: 0.1
   lookXLimit: {x: -80, y: 80}
   isGrounded: 0
